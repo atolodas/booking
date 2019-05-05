@@ -62,9 +62,14 @@ class Product extends AdminController
      */
     public function product_manage(){
         $p_name = input('get.p_name');
+        $h_name = input('get.h_name');
+        $query_start_time = input('get.query_start_time');    //开始时间xxxx-xx-xx
+        $query_end_time = input('get.query_end_time');    //结束时间xxxx-xx-xx
         $where = array();
-        if($p_name){
-            $where[] = ['p_name','like', '%'.$p_name.'%'];
+        if($p_name)$where[] = ['p_name','like', '%'.$p_name.'%'];
+        if($h_name)$where[] = ['h_name','like', '%'.$h_name.'%'];
+        if (!empty($query_start_time) || !empty($query_end_time)) {
+            $where[] = get_query_time('create_time',$query_start_time,$query_end_time);
         }
         $field = 'p_id,p_name,h_name,create_time';
         $list = $this->model_product->getListPageTotalInfo($where, [], $field, 10);

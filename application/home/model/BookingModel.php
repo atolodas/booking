@@ -41,12 +41,7 @@ class BookingModel extends Model
     public function getListInfo($where = [], $join = [], $field = '*', $order = '', $limit = '')
     {
         if(!$order)$order = $this->pk.' desc';
-        $res_list = $this->alias('a')->where($where)->join($join)->field($field)->order($order)->limit($limit)->select();
-        //统一转成数组形式返回
-        foreach ($res_list as &$v){
-            $v = $v->toArray();
-        }
-        $res_list->toArray();
+        $res_list = $this->alias('a')->where($where)->join($join)->field($field)->order($order)->limit($limit)->select()->toArray();
         return $res_list;
     }
     /**

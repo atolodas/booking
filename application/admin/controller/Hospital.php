@@ -7,7 +7,6 @@ use app\home\model\HospitalModel;
 class Hospital extends AdminController
 {
     private $model_hospital = [];
-    private $model_hospital_time = [];
     public function __construct()
     {
         parent::__construct();
@@ -51,17 +50,18 @@ class Hospital extends AdminController
      */
     public function hospital_manage(){
         $h_name = input('get.h_name');
+        $query_start_time = input('get.query_start_time');    //开始时间xxxx-xx-xx
+        $query_end_time = input('get.query_end_time');    //结束时间xxxx-xx-xx
         $where = array();
         if($h_name){
             $where[] = ['h_name','like', '%'.$h_name.'%'];
         }
+        if (!empty($query_start_time) || !empty($query_end_time)) {
+            $where[] = get_query_time('create_time',$query_start_time,$query_end_time);
+        }
         $field = '';
         $list = $this->model_hospital->getListPageTotalInfo($where, [], $field, 10);
 //        echo Db::getLastSql();
-        foreach ($list['data'] as $k=>$v){
-//            $h_time_arr = $this->model_hospital_time->getListInfo([['h_id','=',$v['h_id']]],[],'ht_id,ht_date,ht_day,ht_stock');
-//            $list['data'][$k]['h_time_arr'] = $h_time_arr;
-        }
 
         return return_info('200', '医院管理列表', $list);
     }
@@ -69,7 +69,12 @@ class Hospital extends AdminController
      * 医院列表
      */
     public function hospital_list(){
-        $list = $this->model_hospital->getListInfo([],[],'h_id,h_name');
+        $h_name = input('get.h_name');
+        $where = [];
+        if($h_name){
+            $where[] = ['h_name','like', '%'.$h_name.'%'];
+        }
+        $list = $this->model_hospital->getListInfo($where,[],'h_id,h_name');
         return return_info('200', '医院列表', $list);
     }
     /**

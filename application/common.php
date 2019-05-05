@@ -1,4 +1,6 @@
 <?php
+use think\Db;
+use app\lib\Excel;
 /**
  * 返回信息
  * @param $code 200：成功  300：失败
@@ -46,4 +48,31 @@ function parameter_check($arr, $type = 0){
         return return_info(300, $error_message.'参数异常,请检查表单');
     }
     return return_info(200, '验证通过', $arr_data);
+}
+/**
+ * 根据数组生成excel
+ * @param array $data   //第一行
+ * @param array $arr    //处理过的需要导出的数据
+ * @param string $title     //文件名
+ */
+function createExcel($data = [], $arr = [], $title = '') {
+    $excel_obj = new Excel();
+    $excel_data = [];
+    //设置样式
+    $excel_obj->setStyle(['id' => 's_title', 'Font' => ['FontName' => '宋体', 'Size' => '12', 'Bold' => '1']]);
+    //header
+    foreach ($data as $v){
+        $excel_data[0][] = ['styleid' => 's_title', 'data' => $v];
+    }
+    foreach ($arr as $k => $v) {
+        $tmp = [];
+        foreach ($v as $value){
+            $tmp[] = ['data' => $value];
+        }
+        $excel_data[] = $tmp;
+    }
+    $excel_data = $excel_obj->charset($excel_data, 'utf-8');
+    $excel_obj->addArray($excel_data);
+    $excel_obj->addWorksheet($excel_obj->charset($title, 'utf-8'));
+    $excel_obj->generateXML($excel_obj->charset($title, 'utf-8') . '-' . date('Y-m-d-H', time()));
 }
