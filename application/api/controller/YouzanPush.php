@@ -11,6 +11,7 @@ class YouzanPush{
      * 获取有赞推送信息
      */
     public function get_push_info(){
+        echo 111;exit;
         $yz_log = new \app\lib\Log();
 
         require_once __DIR__ . '/../../lib/open/YzConfig.php';
