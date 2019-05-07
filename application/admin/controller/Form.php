@@ -89,24 +89,6 @@ class Form extends Controller
         }
     }
     /**
-     * 表单展示数据（废弃）
-     */
-    public function form_web(){
-        $p_id = input('get.p_id');
-        if(empty($p_id)){
-            return return_info(300);
-        }
-        $model_product = new ProductModel();
-        $model_product_time = new ProductTimeModel();
-        $product = $model_product->getInfo([['a.p_id','=',$p_id]],[['bo_hospital b','a.h_id=b.h_id']],'b.h_name,b.h_remark');
-        if (!$product)return return_info(300,'该产品出错');
-        //获取预约时间和库存信息
-        $p_time_arr = $model_product_time->getListInfo([['p_id','=',$p_id]],[],'pt_date,pt_day,pt_stock');
-        $product['p_time_arr'] = $p_time_arr;
-        //附带
-        return return_info(200,'',$product);
-    }
-    /**
      * 根据订单号判断是否显示二三针带回
      */
     public function get_bring_back(){
@@ -136,6 +118,24 @@ class Form extends Controller
         $arr['p_time_arr'] = $p_time_arr;
 
         return return_info(200, '成功',$arr);
+    }
+    /**
+     * 表单展示数据（废弃）
+     */
+    public function form_web(){
+        $p_id = input('get.p_id');
+        if(empty($p_id)){
+            return return_info(300);
+        }
+        $model_product = new ProductModel();
+        $model_product_time = new ProductTimeModel();
+        $product = $model_product->getInfo([['a.p_id','=',$p_id]],[['bo_hospital b','a.h_id=b.h_id']],'b.h_name,b.h_remark');
+        if (!$product)return return_info(300,'该产品出错');
+        //获取预约时间和库存信息
+        $p_time_arr = $model_product_time->getListInfo([['p_id','=',$p_id]],[],'pt_date,pt_day,pt_stock');
+        $product['p_time_arr'] = $p_time_arr;
+        //附带
+        return return_info(200,'',$product);
     }
     /**
      * 表单管理列表
