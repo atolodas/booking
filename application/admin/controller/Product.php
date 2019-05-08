@@ -44,6 +44,7 @@ class Product extends AdminController
         }
         //处理时间
         foreach ($pt_time_arr as $k=>$v){
+            if(empty($data['pt_id']))unset($pt_time_arr[$k]['pt_id']);
             $pt_time_arr[$k]['h_id'] = $data['h_id'];
             $pt_time_arr[$k]['h_name'] = $data['h_name'];
             $pt_time_arr[$k]['p_id'] = $p_id;

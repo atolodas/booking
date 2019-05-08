@@ -2,8 +2,11 @@
 namespace app\lib\open;
 
 class Youzan{
-    private $api_version = '';//要调用的api版本号
     private $access_token = '';
+    private $client = [];
+    private $my_params = [];
+    private $api_version = '';//要调用的api版本号
+    private $method = '';
     /**
      * 获得token
      * @return mixed
@@ -20,19 +23,40 @@ class Youzan{
         $keys['kdt_id'] = $config->kdt_id;
         $res = $token->get_token( $type , $keys );
         $this->access_token = $res['access_token'];
+        $this->client = new \YZTokenClient($this->access_token);
     }
     /**
      * 根据订单号获取订单详情
      */
     public function order_detail($order_sn=''){
-        $client = new \YZTokenClient($this->access_token);
-        $method = 'youzan.trade.get';//要调用的api名称
+        $this->method = 'youzan.trade.get';//要调用的api名称
         $this->api_version = '4.0.0';
-        $my_params = [
+        $this->my_params = [
             'tid' => $order_sn,
         ];
+        return $this->to_output();
+    }
+    /**
+     * 获取订单列表
+     */
+    public function order_list(){
+        $this->method = 'youzan.trade.get';//要调用的api名称
+        $this->api_version = '4.0.0';
+        $this->my_params = [
 
-        $response = $client->post($method, $this->api_version, $my_params);
+        ];
+        return $this->to_output();
+    }
+
+    /**
+     * 请求api返回数据
+     */
+    private function to_output(){
+        $response = $this->client->post($this->method, $this->api_version, $this->my_params);
+        //记录返回日志
+        $yz_log = new \app\lib\Log();
+        $yz_log->log_entry('请求api返回数据',$response);//将接收到的原始数据记录日志
+
         if(isset($response['response'])){
             return return_info(200,'',$response['response']);
         }else{

@@ -5,9 +5,6 @@ use app\home\model\ProductModel;
 use app\home\model\ProductTimeModel;
 use think\Db;
 use think\Controller;
-use app\lib\Pinyin;
-use app\lib\Idcard;
-use app\lib\open\Youzan;
 use app\home\model\FormModel;
 
 class Form extends Controller

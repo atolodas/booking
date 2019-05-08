@@ -14,7 +14,8 @@ class Log
     public function log_entry($msg,$content) {
 
         $request = request();
-        $filename = BASE_ROOT_PATH.'/../runtime/youzan_log/' . $request->action() . '_' . date('Ymd') . '.log';
+        $filename = BASE_ROOT_PATH.'/../runtime/youzan_log/' . date('Ymd');
+        $this->create_folders($filename);
 
         if (is_array($content)) {
             $context = var_export($content,true);
@@ -29,6 +30,9 @@ class Log
                ];
         $log = implode(PHP_EOL,$log);
 
-        file_put_contents($filename, $log . PHP_EOL, FILE_APPEND);
+        file_put_contents($filename.'/' . $request->action() . '_' .  date('H') . '.log', $log . PHP_EOL, FILE_APPEND);
+    }
+    private function create_folders($dir) {
+        return is_dir($dir) or ($this->create_folders(dirname($dir)) and mkdir($dir, 0777));
     }
 }
