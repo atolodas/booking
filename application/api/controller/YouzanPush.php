@@ -220,11 +220,11 @@ class YouzanPush{
         $yz_log->log_entry('msg数据',$msg);    //将msg数据记录日志
 
         //根据 type 来识别消息事件类型
-        if($json_data['type'] == "trade_TradeBuyerPay"){
-            //买家付款完成创建消息,主订单状态为「等待商家发货」时触发
+        if($json_data['type'] == "trade_TradeCreate"){//交易创建
+            //当一笔订单创建时会通知该消息
             $data = array();
             $data['order_sn'] = $order_detail['order_info']['tid'];//订单号
-//            $created = $order_detail['order_info']['created'];//下单时间
+            $data['created'] = $order_detail['order_info']['created'];//下单时间
             $orders = $order_detail['orders'][0];
 
             $data['title'] = $orders['title'];  //产品名称

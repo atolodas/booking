@@ -18,7 +18,7 @@ class Order extends AdminController
     public function order_manage(){
 //        $field_name = input('get.field_name');  //name：姓名，phone:名称
         $field_value = input('get.field_value');    //
-        $map1 = $map2 = array();
+        $where = array();
         if(!empty($field_value)){
             $map1 = [
                 ['buyer_messages', 'like', '%'.$field_value.'%'],
@@ -26,10 +26,10 @@ class Order extends AdminController
             $map2 = [
                 ['address_info', 'like', '%'.$field_value.'%'],
             ];
+            $where = [ $map1, $map2];
         }
-        $field = 'o_id,order_sn,buyer_messages,address_info';
-
-        $list = $this->model_order->whereOr([ $map1, $map2])->field($field)->order('o_id desc')->paginate(10)->toArray();;
+        $field = 'o_id,order_sn,buyer_messages,address_info,created';
+        $list = $this->model_order->whereOr($where)->field($field)->order('o_id desc')->paginate(15)->toArray();;
 //        echo Db::getLastSql();
         foreach ($list['data'] as $k=>&$v){
             $v['buyer_messages'] = unserialize($v['buyer_messages']);

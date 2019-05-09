@@ -28,7 +28,7 @@ class Youzan{
     /**
      * 根据订单号获取订单详情
      */
-    public function order_detail($order_sn=''){
+    public function youzan_order_detail($order_sn=''){
         $this->method = 'youzan.trade.get';//要调用的api名称
         $this->api_version = '4.0.0';
         $this->my_params = [
@@ -39,12 +39,10 @@ class Youzan{
     /**
      * 获取订单列表
      */
-    public function order_list(){
-        $this->method = 'youzan.trade.get';//要调用的api名称
+    public function youzan_order_list($my_params = []){
+        $this->method = 'youzan.trades.sold.get';//要调用的api名称
         $this->api_version = '4.0.0';
-        $this->my_params = [
-
-        ];
+        $this->my_params = $my_params;
         return $this->to_output();
     }
 
@@ -53,9 +51,9 @@ class Youzan{
      */
     private function to_output(){
         $response = $this->client->post($this->method, $this->api_version, $this->my_params);
-        //记录返回日志
-        $yz_log = new \app\lib\Log();
-        $yz_log->log_entry('请求api返回数据',$response);//将接收到的原始数据记录日志
+        //记录返回日志，数量太大，有需要再开启日志
+//        $yz_log = new \app\lib\Log();
+//        $yz_log->log_entry('请求api返回数据',$response);//将接收到的原始数据记录日志
 
         if(isset($response['response'])){
             return return_info(200,'',$response['response']);

@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\member\model\MemberTokenModel;
 use think\Db;
 use app\admin\model\AdminModel;
 
@@ -32,16 +33,16 @@ class Login extends AdminController
         $data['login_num'] = $admin['login_num'] + 1;
         $data['last_login_time'] = date('Y-m-d H:i:s');
         $this->model_admin->save($data,[['admin_id','=',$admin['admin_id']]]);
-        $admininfo = [
-            'admin_id' => $admin['admin_id'],
+
+        $model_member_token = new MemberTokenModel();
+        $token = $model_member_token->save_token($admin['admin_id'],$admin['admin_account'],$admin['admin_password']);
+
+        $res = [
             'admin_account' => $admin['admin_account'],
-            'admin_name' => $admin['admin_name']
+            'admin_name' => $admin['admin_name'],
+            'sess' => $token,
         ];
-        session('admin_info',$admininfo);
-
-        unset($admin['admin_id'],$admin['admin_password'],$admin['login_num'],$admin['salt']);
-
-        return return_info(200,'登录成功',$admin);
+        return return_info(200,'登录成功',$res);
     }
     /**
      * 修改密码

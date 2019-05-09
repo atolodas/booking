@@ -1,36 +1,17 @@
 <?php
 namespace app\admin\controller;
 
-use app\home\model\ProductModel;
-use app\home\model\ProductTimeModel;
 use think\Db;
 use think\Controller;
 use app\home\model\FormModel;
 
-class Form extends Controller
+class Form extends AdminController
 {
     private $model_form = [];
     public function __construct()
     {
+        parent::__construct();
         $this->model_form = new FormModel();
-    }
-    /**
-     * 表单展示数据（废弃）
-     */
-    public function form_web(){
-        $p_id = input('get.p_id');
-        if(empty($p_id)){
-            return return_info(300);
-        }
-        $model_product = new ProductModel();
-        $model_product_time = new ProductTimeModel();
-        $product = $model_product->getInfo([['a.p_id','=',$p_id]],[['bo_hospital b','a.h_id=b.h_id']],'b.h_name,b.h_remark');
-        if (!$product)return return_info(300,'该产品出错');
-        //获取预约时间和库存信息
-        $p_time_arr = $model_product_time->getListInfo([['p_id','=',$p_id]],[],'pt_date,pt_day,pt_stock');
-        $product['p_time_arr'] = $p_time_arr;
-        //附带
-        return return_info(200,'',$product);
     }
     /**
      * 表单管理列表
@@ -57,7 +38,7 @@ class Form extends Controller
         if ($is_outexcel == 1) {  //导出
             $list = $this->model_form->getListInfo($where, [], $field, 1);
         } else {
-            $field .= ',f_id,p_id';
+            $field .= ',f_id';
             $list = $this->model_form->getListPageTotalInfo($where, [], $field, 1);
         }
         foreach ($list as $k=>$v){
