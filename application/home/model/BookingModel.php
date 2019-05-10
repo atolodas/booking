@@ -6,6 +6,8 @@ class BookingModel extends Model
 {
     // 关闭自动写入update_time字段
     protected $updateTime = false;
+
+    protected $token_salt = 'bki';  //生成token的盐值
     /**
      * 得到信息   单条
      * @param string $where 条件
