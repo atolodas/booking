@@ -36,10 +36,10 @@ class Form extends AdminController
         $field = 'f_api,f_order_time,f_organization,f_project,f_collect,f_bring_back,f_shop,f_name,f_pinyin,f_phone,f_sex,f_birthday,f_age,f_weight,f_date,f_time,f_pass_check,f_id_card,f_passport,f_order_sn,f_remark,f_address,create_time';
 
         if ($is_outexcel == 1) {  //导出
-            $list = $this->model_form->getListInfo($where, [], $field, 1);
+            $list = $this->model_form->getListInfo($where, [], $field);
         } else {
             $field .= ',f_id';
-            $list = $this->model_form->getListPageTotalInfo($where, [], $field, 1);
+            $list = $this->model_form->getListPageTotalInfo($where, [], $field);
         }
         foreach ($list as $k=>$v){
         }

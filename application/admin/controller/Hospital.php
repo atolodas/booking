@@ -60,7 +60,7 @@ class Hospital extends AdminController
             $where[] = get_query_time('create_time',$query_start_time,$query_end_time);
         }
         $field = '';
-        $list = $this->model_hospital->getListPageTotalInfo($where, [], $field, 10);
+        $list = $this->model_hospital->getListPageTotalInfo($where, [], $field);
 //        echo Db::getLastSql();
 
         return return_info('200', '医院管理列表', $list);

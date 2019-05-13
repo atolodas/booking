@@ -18,4 +18,5 @@ Route::rule('form_manage','form/form_manage'); //表单管理列表
 
 Route::rule('order_manage','order/order_manage'); //订单管理列表
 
+Route::rule('get_hpv','hpv/get_hpv'); //
 

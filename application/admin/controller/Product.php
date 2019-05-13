@@ -73,7 +73,7 @@ class Product extends AdminController
             $where[] = get_query_time('create_time',$query_start_time,$query_end_time);
         }
         $field = 'p_id,p_name,h_name,create_time';
-        $list = $this->model_product->getListPageTotalInfo($where, [], $field, 10);
+        $list = $this->model_product->getListPageTotalInfo($where, [], $field);
 //        echo Db::getLastSql();
 //        foreach ($list['data'] as $k=>$v){
 //            $h_time_arr = $this->model_product_time->getListInfo([['p_id','=',$v['p_id']]],[],'pt_id,pt_date,pt_day,pt_stock');

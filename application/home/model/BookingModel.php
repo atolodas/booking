@@ -55,7 +55,7 @@ class BookingModel extends Model
      * @param string $order 排序
      * @return mixed
      */
-    public function getListPageTotalInfo($where = [], $join = [], $field = '*', $pagesize = 20, $order = '')
+    public function getListPageTotalInfo($where = [], $join = [], $field = '*', $pagesize = 10, $order = '')
     {
         if(!$order)$order = $this->pk.' desc';
         $res = $this->alias('a')->where($where)->join($join)->field($field)->order($order)->paginate($pagesize)->toArray();

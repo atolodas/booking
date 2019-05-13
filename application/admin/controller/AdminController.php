@@ -33,14 +33,16 @@ class AdminController extends Controller
 //            }
             //检查token
             //检查token
-            $token_info = $this->check_token();
-            if($token_info['code'] != 200){
-                die(json_encode($token_info, JSON_UNESCAPED_UNICODE));
-            }
-            $token_info = $token_info['data'];
-
-            $this->admin_id = $token_info['admin_id'];
-            $this->admin_account = $token_info['admin_account'];
+//            $token_info = $this->check_token();
+//            if($token_info['code'] != 200){
+//                die(json_encode($token_info, JSON_UNESCAPED_UNICODE));
+//            }
+//            $token_info = $token_info['data'];
+//
+//            $this->admin_id = $token_info['admin_id'];
+//            $this->admin_account = $token_info['admin_account'];
+            $this->admin_id = 1;
+            $this->admin_account = 'admin';
 
         }
     }

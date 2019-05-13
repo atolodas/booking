@@ -2,6 +2,7 @@
 
 namespace app\web\controller;
 
+use app\home\model\HpvModel;
 use app\home\model\ProductModel;
 use app\home\model\ProductTimeModel;
 use think\Db;
@@ -57,6 +58,10 @@ class form extends Controller
         $f_project = explode(' ',$title);
         //预约项目
         $data['f_project'] = $f_project[0];
+        //是否为HPV预约
+        if(stripos($data['f_project'],'hpv') !== false){
+            $data['f_type'] = 1;//1:hpv
+        }
 //        //二三针是否带回
 //        $buyer_messages = json_decode($buyer_messages,true);
 //        $data['f_bring_back'] = isset($buyer_messages['是否带回']) ? $buyer_messages['是否带回'] : '';
@@ -78,6 +83,11 @@ class form extends Controller
 //        var_dump($data['f_sex']);exit;
         $res = $this->model_form->allowField(true)->save($data);
         if($res){
+            //是否为HPV预约
+            if(stripos($data['f_project'],'hpv') !== false){
+                $model_hpv = new HpvModel();
+                $model_hpv->add_hpv($data['f_name'],$data['f_phone'],1,$data['f_date'],$data['f_time'],1,$this->model_form->f_id);
+            }
             return return_info(200,'操作成功');
         }else{
             return return_info(300,'操作失败');
