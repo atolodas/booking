@@ -30,7 +30,7 @@ class MemberTokenModel extends BookingModel
             $data['member_id'] = $member_id;
             $data['s_type'] = $s_type;
             //存储新token
-            $this->addInfo($data);
+            $this->save($data);
         }
         return $data['token'];
     }
