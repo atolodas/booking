@@ -92,7 +92,7 @@ class YouzanPush{
                 case 'trade_TradePartlySellerShip':   //卖家部分发货
                 case 'trade_TradeSellerShip':   //卖家发货
                     $order_sn = $msg['tid'];//订单号
-                    $data['status'] = 'WAIT_SELLER_SEND_GOODS';
+                    $data['status'] = 'WAIT_BUYER_CONFIRM_GOODS';
                     $data['status_str'] = '已发货';
                     $res = $model_order->save($data,[['order_sn','=',$order_sn]]);
                     $mess = '卖家发货结果';
