@@ -52,17 +52,22 @@ class YouzanPush{
 
                     $data['title'] = $orders['title'];  //产品名称
                     $buyer_note = [];
-                    foreach (json_decode($orders['buyer_messages'],true) as $k => $v) {
-                        switch (trim($k)) {
-                            case '姓名':
-                                $buyer_note['realname']=$v;
-                                break;
-                            case '手机号码':
-                            case '手机':
-                            case '手机号':
-                                $buyer_note['mobile']=$v;
-                                break;
+                    if(!empty($orders['buyer_messages'])){
+                        foreach (json_decode($orders['buyer_messages'],true) as $k => $v) {
+                            switch (trim($k)) {
+                                case '姓名':
+                                    $buyer_note['realname']=$v;
+                                    break;
+                                case '手机号码':
+                                case '手机':
+                                case '手机号':
+                                    $buyer_note['mobile']=$v;
+                                    break;
+                            }
                         }
+                    }else{
+                        $buyer_note['realname']='';
+                        $buyer_note['mobile']='';
                     }
                     $data['buyer_messages'] = serialize($buyer_note);  //
                     $data['buyer_words'] = $order_detail['remark_info']['buyer_message'];  //买家留言

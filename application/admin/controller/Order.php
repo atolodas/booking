@@ -21,7 +21,7 @@ class Order extends AdminController
         if(!empty($field_value)){
             $where[] = ['buyer_messages|address_info|buyer_words|seller_memo','like', '%'.$field_value.'%'];
         }
-        $field = 'o_id,order_sn,buyer_messages,address_info,buyer_words,seller_memo,created';
+        $field = 'o_id,title,order_sn,buyer_messages,address_info,buyer_words,seller_memo,status_str,created';
         $list = $this->model_order->where($where)->field($field)->order('created desc')->paginate(10)->toArray();;
 //        echo Db::getLastSql();
         foreach ($list['data'] as $k=>&$v){
