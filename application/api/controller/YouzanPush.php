@@ -51,6 +51,7 @@ class YouzanPush{
                     $orders = $order_detail['orders'][0];
 
                     $data['title'] = $orders['title'];  //产品名称
+                    $data['num'] = $orders['num'];  //产品数量
                     $buyer_note = [];
                     if(!empty($orders['buyer_messages'])){
                         foreach (json_decode($orders['buyer_messages'],true) as $k => $v) {
@@ -90,13 +91,12 @@ class YouzanPush{
                     break;
                 case 'trade_TradePartlySellerShip':   //卖家部分发货
                 case 'trade_TradeSellerShip':   //卖家发货
-//                    $order_detail = $msg['full_order_info'];
-//                    $order_sn = $order_detail['order_info']['tid'];//订单号
-//                    $data['status'] = $order_detail['order_info']['status'];
-//                    $data['status_str'] = $order_detail['order_info']['status_str'];
-//                    $res = $model_order->save($data,[['order_sn','=',$order_sn]]);
-//                    $mess = '卖家发货结果';
-//                    $yz_log->log_entry($mess,$res);
+                    $order_sn = $msg['tid'];//订单号
+                    $data['status'] = 'WAIT_SELLER_SEND_GOODS';
+                    $data['status_str'] = '已发货';
+                    $res = $model_order->save($data,[['order_sn','=',$order_sn]]);
+                    $mess = '卖家发货结果';
+                    $yz_log->log_entry($mess,$res);
                     break;
                 case 'trade_TradeMemoModified':   //卖家修改交易备注
                     $seller_memo = $msg['seller_memo'];
