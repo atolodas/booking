@@ -11,10 +11,10 @@ class Log
     /**
      * 录入日志
      */
-    public function log_entry($msg,$content) {
+    public function log_entry($msg,$content,$type='youzan') {
 
         $request = request();
-        $filename = BASE_ROOT_PATH.'/../runtime/youzan_log/' . date('Ym');
+        $filename = BASE_ROOT_PATH.'/../runtime/'.$type.'_log/' . date('Ym');
         $this->create_folders($filename);
 
         if (is_array($content)) {

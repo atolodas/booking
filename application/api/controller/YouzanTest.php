@@ -8,7 +8,7 @@ use app\home\model\OrderModel;
 use app\lib\open\Youzan;
 use think\Controller;
 
-class Test extends Controller
+class YouzanTest extends Controller
 {
     private $model_order = [];
     private $youzan = [];
@@ -87,8 +87,9 @@ class Test extends Controller
         $con = [];
         $con['page_no'] = $page_no;
         $con['page_size'] = 100;
-        $con['start_created'] = '2019-05-01 00:00:00';
-        $con['end_created'] = '2019-05-08 11:01:55';//7月后没有留言
+        $con['start_created'] = '2018-04-01 00:00:00';
+        $con['end_created'] = '2018-06-30 23:59:59';
+//        $con['end_created'] = date('Y-m-d H:i:s');
         $order_list = $this->youzan->youzan_order_list($con);
 //        var_dump($order_list);exit;
 //        return $order_list;exit;
@@ -102,8 +103,16 @@ class Test extends Controller
             if($o_id){
                 $data = [];
                 $data['o_id'] = $o_id['o_id'];
-                $data['buyer_words'] = !empty($v['full_order_info']['remark_info']['buyer_message']) ? $v['full_order_info']['remark_info']['buyer_message'] : '';//买家留言
-                $data['seller_memo'] = !empty($v['full_order_info']['remark_info']['trade_memo']) ? $v['full_order_info']['remark_info']['trade_memo'] : '';//卖家留言
+                $data['status'] = !empty($v['full_order_info']['order_info']['status']) ? $v['full_order_info']['order_info']['status'] : '';
+                $data['status_str'] = !empty($v['full_order_info']['order_info']['status_str']) ? $v['full_order_info']['order_info']['status_str'] : '';
+                $data['num'] = $v['full_order_info']['orders'][0]['num'];
+//                $data['pay_time'] = $v['full_order_info']['order_info']['pay_time'];
+
+
+//                $data['refund_state'] = $v['full_order_info']['order_info']['refund_state'];//没能同步退款状态则暂时不导退款状态数据
+
+//                $data['buyer_words'] = !empty($v['full_order_info']['remark_info']['buyer_message']) ? $v['full_order_info']['remark_info']['buyer_message'] : '';//买家留言
+//                $data['seller_memo'] = !empty($v['full_order_info']['remark_info']['trade_memo']) ? $v['full_order_info']['remark_info']['trade_memo'] : '';//卖家留言
                 $arr[] = $data;
             }
 //            $res = $this->model_order->save($data,[['order_sn','=',$order_sn]]);

@@ -28,10 +28,10 @@ class Form extends AdminController
         if($f_name)$where[] = ['f_name','like', '%'.$f_name.'%'];
         if($f_organization)$where[] = ['f_organization','like', '%'.$f_organization.'%'];
         if (!empty($f_order_time_start) || !empty($f_order_time_end)) {//下单时间
-            $where[] = get_query_time('f_order_time',$f_order_time_start,$f_order_time_end);
+            $where[] = getQueryTime('f_order_time',$f_order_time_start,$f_order_time_end);
         }
         if (!empty($query_start_time) || !empty($query_end_time)) {//表单提交时间
-            $where[] = get_query_time('create_time',$query_start_time,$query_end_time);
+            $where[] = getQueryTime('create_time',$query_start_time,$query_end_time);
         }
         $field = 'f_api,f_order_time,f_organization,f_project,f_collect,f_bring_back,f_shop,f_name,f_pinyin,f_phone,f_sex,f_birthday,f_age,f_weight,f_date,f_time,f_pass_check,f_id_card,f_passport,f_order_sn,f_remark,f_address,create_time';
 

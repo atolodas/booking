@@ -57,7 +57,7 @@ class Hospital extends AdminController
             $where[] = ['h_name','like', '%'.$h_name.'%'];
         }
         if (!empty($query_start_time) || !empty($query_end_time)) {
-            $where[] = get_query_time('create_time',$query_start_time,$query_end_time);
+            $where[] = getQueryTime('create_time',$query_start_time,$query_end_time);
         }
         $field = '';
         $list = $this->model_hospital->getListPageTotalInfo($where, [], $field);
