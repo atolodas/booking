@@ -31,6 +31,18 @@ class Order extends AdminController
 
         return return_info('200', '订单管理列表', $list);
     }
+    public function order_outexcel(){
+
+        $field = 'order_sn,title,total_fee,num,status_str,created';
+        $list = $this->model_order->getListInfo([], [], $field,'created desc');
+        $arr1[] = '订单号';
+        $arr1[] = '产品名称';
+        $arr1[] = '价格';
+        $arr1[] = '数量';
+        $arr1[] = '状态';
+        $arr1[] = '下单时间';
+        createExcel($arr1, $list, '橄榄枝健康订单');
+    }
 
 
 }

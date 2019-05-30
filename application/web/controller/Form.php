@@ -5,34 +5,19 @@ namespace app\web\controller;
 use app\home\model\HpvModel;
 use app\home\model\ProductModel;
 use app\home\model\ProductTimeModel;
-use app\lib\rsa_key\Rsakey;
+use app\home\logic\Sms as logic_sms;
+use app\member\model\MemberTokenModel;
+use think\captcha\Captcha;
 use think\Db;
-use think\Controller;
 use app\lib\Pinyin;
 use app\lib\Idcard;
 use app\lib\open\Youzan;
 
-class form extends Controller
+class form extends FormController
 {
     public function __construct()
     {
         parent::__construct();
-        $rsa_key = new Rsakey();
-
-        if (empty($_POST['secret'])){
-            die(json_encode(['code'=>300,'message'=>'数据错误'],JSON_UNESCAPED_UNICODE));
-        }
-        try{
-            $val = $rsa_key->PrivateDecrypt($_POST['secret']);
-            if(empty($val)){
-                throw new \Exception(34);
-            }
-            die(json_encode(['code'=>200,'message'=>$val],JSON_UNESCAPED_UNICODE));
-            $_POST = json_decode($val,true);
-        }catch (\Exception $e){
-//            die(json_encode(['code'=>300,'message'=>'参数解析错误'],JSON_UNESCAPED_UNICODE));
-            die(json_encode(['code'=>300,'message'=>json_encode($e->getMessage())],JSON_UNESCAPED_UNICODE));
-        }
     }
     /**
      * 添加表单
@@ -223,4 +208,45 @@ class form extends Controller
 
         return return_info(200, '成功',$arr);
     }
+    /**
+     * 登录预约系统
+     */
+    public function login_form(){
+
+        $sl_phone = input('post.phone');
+        $captcha_code = input('post.captcha');//图形验证码
+        $sl_id = input('post.sl_id');//手机验证码id
+        $sl_captcha = input('post.phone_code');//手机验证码
+        if(empty($sl_phone) || empty($sl_id) || empty($sl_captcha)){
+            return return_info();
+        }
+        //检查是否需要开启图形验证码
+        $logic_sms = new logic_sms;
+        $is_captcha = $logic_sms->check_captcha($sl_phone);
+        if($is_captcha)
+        {
+            if(empty($captcha_code))
+            {
+                return return_info(300,'图形验证码');
+            }
+            // 检查图形验证码
+            $captcha = new Captcha();
+            if( !$captcha->check($captcha_code))
+            {
+                return return_info(300,'图形验证码错误');
+            }
+        }
+        //检查手机验证码
+        $code_info = $logic_sms->sms_check($sl_id,$sl_phone,$sl_captcha);
+        if (isset($code_info['code']) && $code_info['code'] != 200) {
+            return $code_info;
+        }
+        $model_member_token = new MemberTokenModel();
+        $token = $model_member_token->save_token($sl_id,$sl_phone,$sl_id.$model_member_token->form_stype,$model_member_token->form_stype);
+
+        return return_info(200,'登录成功',['token'=>$token]);
+    }
+
+
+
 }

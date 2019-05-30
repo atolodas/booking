@@ -52,6 +52,7 @@ class YouzanPush{
 
                     $data['title'] = $orders['title'];  //产品名称
                     $data['num'] = $orders['num'];  //产品数量
+                    $data['total_fee'] = $orders['total_fee'];  //
                     $buyer_note = [];
                     if(!empty($orders['buyer_messages'])){
                         foreach (json_decode($orders['buyer_messages'],true) as $k => $v) {

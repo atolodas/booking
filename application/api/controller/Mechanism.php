@@ -4,15 +4,18 @@
  */
 namespace app\api\controller;
 
+use app\home\model\FormModel;
 use think\Controller;
 use app\lib\rsa_key\Rsakey;
 
-class Mechanism extends Controller
-//class Mechanism extends CheckShop
+//class Mechanism extends Controller
+class Mechanism extends CheckShop
 {
+    private $model_form = [];
     public function __construct()
     {
         parent::__construct();
+        $this->model_form = new FormModel();
     }
     //生成 shopid 和 shopsecret
 //    public function create_shopid(){
@@ -27,27 +30,24 @@ class Mechanism extends Controller
     /**
      * 添加针剂记录/更改状态
      */
-    public function add_injection(){
+    public function injection_add(){
 
-        $rsa_key = new Rsakey();
-//        $str = $rsa_key->public_encrypt(json_encode($_POST));
-//        echo $str;
-//        echo $rsa_key->private_decrypt($str);
-        $str = $rsa_key->PublicEncrypt($_POST);
-        echo $str;
-        echo $rsa_key->PrivateDecrypt($str);
-        exit;
         var_dump($this->post_data);
         $post_data = $this->post_data;
+        $data['f_id'] = $post_data['f_id'];
         $data['f_date'] = $post_data['f_date'];
         $data['f_time'] = $post_data['f_time'];
         $data['f_phone'] = $post_data['f_phone'];
         //插入数据
+        $res = $this->model_form->save($data);
+        if($res){
+            return return_info(200,'操作成功');
+        }else{
+            return return_info(300,'操作失败');
+        }
     }
-    /**
-     * 其它针剂的记录/更改记录
-     */
-    public function other_injection(){
+    public function injection_status(){
+        $res = $this->model_form->save([],['']);
 
     }
 

@@ -40,6 +40,8 @@ class YouzanTest extends Controller
         foreach ($order_list as $k=>$v){
             $arr[$k]['order_sn'] = $v['full_order_info']['order_info']['tid'];
             $arr[$k]['title'] = $v['full_order_info']['orders'][0]['title'];
+            $arr[$k]['total_fee'] = $v['full_order_info']['orders'][0]['total_fee'];
+            $arr[$k]['num'] = $v['full_order_info']['orders'][0]['num'];
             $arr[$k]['created'] = $v['full_order_info']['order_info']['created'];
             $arr[$k]['pay_time'] = $v['full_order_info']['order_info']['pay_time'];
             if(!empty($v['full_order_info']['address_info'])){
@@ -87,8 +89,8 @@ class YouzanTest extends Controller
         $con = [];
         $con['page_no'] = $page_no;
         $con['page_size'] = 100;
-        $con['start_created'] = '2018-04-01 00:00:00';
-        $con['end_created'] = '2018-06-30 23:59:59';
+        $con['start_created'] = '2018-01-01 00:00:00';
+        $con['end_created'] = '2018-03-19 11:23:24';
 //        $con['end_created'] = date('Y-m-d H:i:s');
         $order_list = $this->youzan->youzan_order_list($con);
 //        var_dump($order_list);exit;
@@ -105,7 +107,8 @@ class YouzanTest extends Controller
                 $data['o_id'] = $o_id['o_id'];
                 $data['status'] = !empty($v['full_order_info']['order_info']['status']) ? $v['full_order_info']['order_info']['status'] : '';
                 $data['status_str'] = !empty($v['full_order_info']['order_info']['status_str']) ? $v['full_order_info']['order_info']['status_str'] : '';
-                $data['num'] = $v['full_order_info']['orders'][0]['num'];
+//                $data['total_fee'] = $v['full_order_info']['orders'][0]['total_fee'];
+//                $data['num'] = $v['full_order_info']['orders'][0]['num'];
 //                $data['pay_time'] = $v['full_order_info']['order_info']['pay_time'];
 
 
@@ -118,12 +121,12 @@ class YouzanTest extends Controller
 //            $res = $this->model_order->save($data,[['order_sn','=',$order_sn]]);
 //            sleep(1);
         }
-        sleep(1);
 //        return $arr;
         if(count($arr) < 1 || $page_no == 100){ //页码，从1开始，最大不能超过100（有赞文档上的限制）
             return $page_no;
         }else{
             $this->model_order->saveAll($arr);
+//            sleep(1);
             return $this->update_order($list,$page_no+1);
         }
     }
