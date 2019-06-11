@@ -68,7 +68,7 @@ class Sms extends FormController
         $message_info = '验证码：' . $verify_code;
         $sl_array['sl_phone'] = $this->phone;
         $sl_array['sl_ip'] = getIp() ? getIp() : '';
-        $sl_array['sl_captcha'] = $verify_code;
+        $sl_array['sl_code'] = $verify_code;
         $sl_array['sl_msg'] = $message_info;
         $sl_array['sl_type'] = 2;//2：手机验证码
         $sl_array['sl_msg_type'] = 1;//1：预约系统

@@ -22,7 +22,7 @@ class Order extends AdminController
             $where[] = ['buyer_messages|address_info|buyer_words|seller_memo','like', '%'.$field_value.'%'];
         }
         $field = 'o_id,title,order_sn,buyer_messages,address_info,buyer_words,seller_memo,status_str,created';
-        $list = $this->model_order->where($where)->field($field)->order('created desc')->paginate(10)->toArray();;
+        $list = $this->model_order->where($where)->field($field)->order('created desc')->paginate(10)->toArray();
 //        echo Db::getLastSql();
         foreach ($list['data'] as $k=>&$v){
             $v['buyer_messages'] = unserialize($v['buyer_messages']);

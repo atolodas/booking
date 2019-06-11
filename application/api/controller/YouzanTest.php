@@ -28,7 +28,7 @@ class YouzanTest extends Controller
         $con = [];
         $con['page_no'] = $page_no;
         $con['page_size'] = 100;
-        $con['start_created'] = '2019-05-13 17:28:38';
+        $con['start_created'] = '2019-05-28 14:16:43';
         $con['end_created'] = date('Y-m-d H:i:s',time());
         $order_list = $this->youzan->youzan_order_list($con);
 //        var_dump($order_list);exit;
@@ -42,6 +42,8 @@ class YouzanTest extends Controller
             $arr[$k]['title'] = $v['full_order_info']['orders'][0]['title'];
             $arr[$k]['total_fee'] = $v['full_order_info']['orders'][0]['total_fee'];
             $arr[$k]['num'] = $v['full_order_info']['orders'][0]['num'];
+            $arr[$k]['status'] = !empty($v['full_order_info']['order_info']['status']) ? $v['full_order_info']['order_info']['status'] : '';
+            $arr[$k]['status_str'] = !empty($v['full_order_info']['order_info']['status_str']) ? $v['full_order_info']['order_info']['status_str'] : '';
             $arr[$k]['created'] = $v['full_order_info']['order_info']['created'];
             $arr[$k]['pay_time'] = $v['full_order_info']['order_info']['pay_time'];
             if(!empty($v['full_order_info']['address_info'])){

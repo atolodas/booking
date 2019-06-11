@@ -14,6 +14,9 @@ class CheckShop extends Controller
     protected $overdue_time = 10; //签名多久过期 10s
     public function __construct()
     {
+        $yz_log = new Log();
+        $yz_log->log_entry('机构原始数据'.$_SERVER['REMOTE_ADDR'],$_POST,'jigou');//将接收到的原始数据记录日志
+
         $post_data = $_POST;
         try {
             if(!isset($post_data['shopid'])|| !isset($post_data['sign']) || !isset($post_data['timestamp'])){
@@ -36,13 +39,11 @@ class CheckShop extends Controller
             if($post_data['timestamp'] + $this->overdue_time < time()){
                 throw new \Exception(1004);
             }
+            unset($post_data['timestamp']);
         } catch (\Exception $e) {
             //记录错误日志
-            $yz_log = new Log();
-//            $yz_log->log_entry('机构原始数据',$post_data,'jigou');//将接收到的原始数据记录日志
-
             $mess = $e->getMessage();
-//            $yz_log->log_entry('错误信息',$mess,'jigou');//记录错误信息
+            $yz_log->log_entry('错误信息',$mess,'jigou');//记录错误信息
 
             if(strlen($mess)==4){
                 die(json_encode(['code'=>$mess,'message'=>'非法请求'],JSON_UNESCAPED_UNICODE));

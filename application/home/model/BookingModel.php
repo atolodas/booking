@@ -62,34 +62,6 @@ class BookingModel extends Model
         return $res;
     }
     /**
-     * 通过分组排序
-     * @param array $where
-     * @param array $join
-     * @param string $field
-     * @param string $order
-     * @param string $limit
-     * @return false|\PDOStatement|string|\think\Collection
-     */
-    public function getListInfoByGroup($where = [], $join = [], $field = '*', $group = '', $limit = '', $order='')
-    {
-        $res_list = $this->alias('a')->where($where)->join($join)->field($field)->group($group)->limit($limit)->order($order)->select();
-        //统一转成数组形式返回
-        foreach ($res_list as &$v){
-            $v = $v->toArray();
-        }
-        return $res_list;
-    }
-    /**
-     * 添加数据
-     * @param array $data
-     * @return 返回自增主键
-     */
-    public function addInfo($data = [])
-    {
-        $res = $this->insertGetId($data);
-        return $res;
-    }
-    /**
      * 删除数据
      * @param array $where
      * @param array $data

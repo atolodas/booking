@@ -108,14 +108,14 @@ class YouzanPush{
                 case 'trade_TradeSuccess':   //交易成功
                     $order_sn = $msg['tid'];//订单号
                     $data['status'] = 'TRADE_SUCCESS';
-                    $data['status_str'] = '订单完成';
+                    $data['status_str'] = '已完成';
                     $res = $model_order->save($data,[['order_sn','=',$order_sn]]);
                     $yz_log->log_entry('交易成功结果',$res);
                     break;
                 case 'trade_TradeClose':   //交易关闭
                     $order_sn = $msg['tid'];//订单号
-                    $data['status'] = 'TRADE_CLOSE';
-                    $data['status_str'] = '订单关闭';
+                    $data['status'] = 'TRADE_CLOSED';
+                    $data['status_str'] = '已关闭';
                     $res = $model_order->save($data,[['order_sn','=',$order_sn]]);
                     $yz_log->log_entry('订单关闭结果',$res);
                     break;

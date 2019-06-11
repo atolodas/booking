@@ -34,16 +34,17 @@ class FormController extends Controller
             'send_sms',
         ])){
             //检查token
-            $token_info = $this->check_token();
+//            $token_info = $this->check_token();
+//
+//            $this->phone = $token_info['member_name']; //登录的手机号
 
-            $this->loginphone = $token_info['member_name'];
         }
 
     }
     /**
      * 检查加密数据
      */
-    public function check_secret(){
+    private function check_secret(){
         $rsa_key = new Rsakey();
         if (empty($_POST['secret'])){
             throw new \Exception('secret数据错误');
@@ -62,7 +63,7 @@ class FormController extends Controller
     /**
      * 检查token
      */
-    public function check_token(){
+    private function check_token(){
         $model_member_token = new MemberTokenModel();
 
         if (empty($_SERVER['HTTP_SESS'])) {
@@ -89,5 +90,26 @@ class FormController extends Controller
         }
 //        return true;
         return $info;
+    }
+    /**
+     * 根据标题获取 预约机构
+     */
+    protected function get_organization($title){
+        preg_match_all('/【(.*?)】/',$title,$result);
+        return isset($result[1][0]) ? $result[1][0] : '';
+    }
+    /**
+     * 根据标题获取 预约项目
+     */
+    protected function get_project($title){
+        $f_project = explode(' ',$title);
+        return isset($f_project[0]) ? $f_project[0] : '';
+    }
+    /**
+     * 根据标题获取 到付 暂未定规则
+     */
+    protected function get_collect($title){
+        $f_collect = explode('|',$title);
+        return isset($f_collect[1]) ? $f_collect[1] : '';
     }
 }

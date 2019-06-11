@@ -73,10 +73,10 @@ class Sms
      * 检查手机验证码
      * @param $sl_id
      * @param $sl_phone
-     * @param $sl_captcha
+     * @param $sl_code
      * @return array
      */
-    public function sms_check($sl_id,$sl_phone,$sl_captcha){
+    public function sms_check($sl_id,$sl_phone,$sl_code){
 
         $model_sms_log = new SmsLogModel;
         $sms_log = $model_sms_log->get($sl_id);
@@ -86,7 +86,7 @@ class Sms
         if($sms_log->sl_phone != $sl_phone){
             return ['code'=>300,'message'=>'验证码和手机号不匹配'];
         }
-        if($sms_log->sl_captcha != $sl_captcha){
+        if($sms_log->sl_code != $sl_code){
             return ['code'=>300,'message'=>'验证码输入错误'];
         }
         if(strtotime($sms_log->create_time) + 60*30 < time()){
