@@ -17,33 +17,34 @@ class AdminController extends Controller
      */
     public function __construct()
     {
-        $request = request();
-        $action_name = $request->action();
-        if(in_array($action_name,[
-            //方法    不需要检查的过滤数组
-            'login',
-            'out_login',
-        ])){
-            //不需要检查
+        if(empty($_GET['is_outexcel'])){
+            $request = request();
+            $action_name = $request->action();
+            if(in_array($action_name,[
+                //方法    不需要检查的过滤数组
+                'login',
+                'out_login',
+            ])){
+                //不需要检查
 
-        }else{
-//            $session = $this->check_session();
-//            if(!$session){
-//                die(json_encode(['code' => "700", 'message' => "1登录已过期，请重新登录"], JSON_UNESCAPED_UNICODE));
-//            }
-            //检查token
-            //检查token
-//            $token_info = $this->check_token();
-//            if($token_info['code'] != 200){
-//                die(json_encode($token_info, JSON_UNESCAPED_UNICODE));
-//            }
-//            $token_info = $token_info['data'];
+            }else{
+//                $session = $this->check_session();
+//                if(!$session){
+//                    die(json_encode(['code' => "700", 'message' => "1登录已过期，请重新登录"], JSON_UNESCAPED_UNICODE));
+//                }
+                //检查token
+//                $token_info = $this->check_token();
+//                if($token_info['code'] != 200){
+//                    die(json_encode($token_info, JSON_UNESCAPED_UNICODE));
+//                }
+//                $token_info = $token_info['data'];
 //
-//            $this->admin_id = $token_info['admin_id'];
-//            $this->admin_account = $token_info['admin_account'];
-            $this->admin_id = 1;
-            $this->admin_account = 'admin';
+//                $this->admin_id = $token_info['admin_id'];
+//                $this->admin_account = $token_info['admin_account'];
+                $this->admin_id = 1;
+                $this->admin_account = 'admin';
 
+            }
         }
     }
     /**

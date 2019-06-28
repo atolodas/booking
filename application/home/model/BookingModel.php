@@ -8,6 +8,15 @@ class BookingModel extends Model
     protected $updateTime = false;
 
     protected $token_salt = 'bki';  //生成token的盐值
+
+    public function getFSexAttr($value){
+        $arr = ['未知','男','女'];
+        if(isset($arr[$value])){
+            return $arr[$value];
+        }else{
+            return $value;
+        }
+    }
     /**
      * 得到信息   单条
      * @param string $where 条件

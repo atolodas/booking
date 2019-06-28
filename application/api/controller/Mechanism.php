@@ -65,7 +65,7 @@ class Mechanism extends CheckShop
                     $this->model_hpv->allowField(['hpv_date','hpv_time','status','finish_time'])->save($data,[['hpv_id','=',$hpv['hpv_id']]]);
                 }else{
                     //增加HPV记录
-                    $res = $this->model_hpv->add_hpv($data['f_id'], $form_info['f_name'], $data['f_phone'], $data['type'], $data['f_date'], $data['f_time']);
+                    $res = $this->model_hpv->add_hpv($data['f_id'], $form_info['f_order_sn'], $form_info['f_name'], $data['f_phone'], $data['type'], $data['f_date'], $data['f_time']);
                     if(!$res){
                         throw new \Exception('1错误');
                     }

@@ -45,6 +45,15 @@ class Youzan{
         $this->my_params = $my_params;
         return $this->to_output();
     }
+    /**
+     * 根据微信粉丝用户的 weixin_openid 或 fans_id 获取用户信息
+     */
+    public function youzan_user_weixin($my_params = []){
+        $this->method = 'youzan.users.weixin.follower.get';
+        $this->api_version = '3.0.0';
+        $this->my_params = $my_params;
+        return $this->to_output();
+    }
 
     /**
      * 请求api返回数据

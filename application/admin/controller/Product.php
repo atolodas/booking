@@ -39,12 +39,19 @@ class Product extends AdminController
             unset($data['pt_time_arr']);
             $product = $this->model_product->where([['p_id','=',$p_id]])->update($data);
         }else{
-            $product = $this->model_product->allowField(true)->save($data);
-            $p_id = $this->model_product->p_id;
+//            $product = $this->model_product->allowField(true)->insertGetId($data);//这种不会调用自动时间戳
+            $product = ProductModel::create($data);
+            $p_id = $product->p_id;
+        }
+        //获取时间主键组合，除此之外的时间全部删除
+        $pt_id_arr = array_filter(array_column($pt_time_arr,'pt_id'));
+        if($pt_id_arr){
+            $this->model_product_time->where([['p_id','=',$p_id],['pt_id','not in',$pt_id_arr]])->delete();
+//            echo Db::getLastSql();
         }
         //处理时间
         foreach ($pt_time_arr as $k=>$v){
-            if(empty($data['pt_id']))unset($pt_time_arr[$k]['pt_id']);
+            if(!$v['pt_id'])unset($pt_time_arr[$k]['pt_id']);
             $pt_time_arr[$k]['h_id'] = $data['h_id'];
             $pt_time_arr[$k]['h_name'] = $data['h_name'];
             $pt_time_arr[$k]['p_id'] = $p_id;
@@ -52,6 +59,7 @@ class Product extends AdminController
         }
         //添加产品销售日期
         $res = $this->model_product_time->saveAll($pt_time_arr);
+//        echo Db::getLastSql();
         if($product || $res){
             return return_info(200,'操作成功');
         }else{
@@ -95,7 +103,7 @@ class Product extends AdminController
             return return_info(300,'删除失败');
         }
         //日期数据
-        $res['h_time_arr'] = $this->model_product_time->getListInfo([['p_id','=',$p_id]],[],'pt_id,pt_date,pt_day,pt_stock');
+        $res['h_time_arr'] = $this->model_product_time->getListInfo([['p_id','=',$p_id]],[],'pt_id,pt_date,pt_day,pt_time,pt_stock');
 
         return return_info(200,'成功',$res);
     }

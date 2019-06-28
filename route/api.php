@@ -4,6 +4,7 @@ Route::rule('get_push_info','api/youzan_push/get_push_info'); //获取有赞推�
 
 Route::rule('get_order','api/YouzanTest/get_order'); //获取有赞历史订单的数据
 Route::rule('update_order','api/YouzanTest/update_order'); //更新订单数据
+Route::rule('update_order1','api/YouzanTest/update_order1'); //更新订单数据
 
 Route::rule('create_shopid','api/Mechanism/create_shopid'); //
 Route::rule('test_sign','api/Mechanism/test_sign'); //

@@ -35,14 +35,14 @@ class Sms
         $attr_list = array_reduce($attr_list, create_function('$v,$w', '$v[$w["attr_name"]]=$w["attr_value"];return $v;'));
 //        var_dump($attr_list);
         $sms_lj = json_decode($attr_list['sms_lj']);
-        foreach ($sms_lj as $name => $value) {
-            //Mozilla/4.0  Firefox/27.0  Mozilla/5.0  Gecko/20100101
-            if (strstr($ua, $value)) {
-//                $data = '代理检查拦截:' . $data;
-//                $this->addInfo(['str' => $data, 'addtime' => $addtime]);
-                return ['code' => 300, 'message' => '禁止代理'];
-            }
-        }
+//        foreach ($sms_lj as $name => $value) {
+//            //Mozilla/4.0  Firefox/27.0  Mozilla/5.0  Gecko/20100101
+//            if (strstr($ua, $value)) {
+////                $data = '代理检查拦截:' . $data;
+////                $this->addInfo(['str' => $data, 'addtime' => $addtime]);
+//                return ['code' => 300, 'message' => '禁止代理'];
+//            }
+//        }
         //查找当天该号码发送短信数，和最后发送的那条短信记录，若次数过多则冻结一个小时
         $last_code = $this->check_day_num($phone);
         //当前时间前一个小时

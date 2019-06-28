@@ -34,9 +34,9 @@ class FormController extends Controller
             'send_sms',
         ])){
             //检查token
-//            $token_info = $this->check_token();
-//
-//            $this->phone = $token_info['member_name']; //登录的手机号
+            $token_info = $this->check_token();
+
+            $this->phone = $token_info['member_name']; //登录的手机号
 
         }
 
