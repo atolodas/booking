@@ -1,5 +1,6 @@
 <?php
 namespace app\api\controller;
+use app\lib\open\Youzan;
 use think\Db;
 use app\home\model\OrderModel;
 /**
@@ -55,6 +56,8 @@ class YouzanPush{
                     $data['total_fee'] = $orders['total_fee'];  //
                     $buyer_note = [];
                     if(!empty($orders['buyer_messages'])){
+                        $data['raw_messages'] = json_encode(json_decode($orders['buyer_messages'],true));
+
                         foreach (json_decode($orders['buyer_messages'],true) as $k => $v) {
                             switch (trim($k)) {
                                 case '姓名':
@@ -72,6 +75,22 @@ class YouzanPush{
                         $buyer_note['mobile']='';
                     }
                     $data['buyer_messages'] = serialize($buyer_note);  //
+
+                    $data['sku_properties_name'] = isset($orders['sku_properties_name']) ? $orders['sku_properties_name'] : '';
+                    $fans_id = $v['full_order_info']['buyer_info']['fans_id'];
+                    if($fans_id){
+                        $youzan = new Youzan();
+                        $user_weixin = $youzan->youzan_user_weixin(['fans_id'=>$fans_id]);
+                        $user_arr = [];
+                        if($user_weixin['code'] == 200){
+                            $user_arr['fans_id'] = $fans_id;
+                            $user_arr['weixin_openid'] = $user_weixin['data']['user']['weixin_openid'];
+                            $user_arr['union_id'] = $user_weixin['data']['user']['union_id'];
+//                    $user_arr['fans_nickname'] = $user_weixin['data']['user']['fans_nickname'];
+                            $data['outer_user_id'] = $user_arr['weixin_openid'];
+                            $data['outer_user_arr'] = json_encode($user_arr);
+                        }
+                    }
                     $data['buyer_words'] = $order_detail['remark_info']['buyer_message'];  //买家留言
                     $address_info = $order_detail['address_info'];
                     $address_info = ['receiver_name'=>$address_info['receiver_name'],'receiver_tel'=>$address_info['receiver_tel']];
