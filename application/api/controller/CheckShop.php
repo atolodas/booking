@@ -11,6 +11,7 @@ use app\lib\Log;
 class CheckShop extends Controller
 {
     protected $post_data = [];
+    protected $shop_code = '';
     protected $overdue_time = 10; //签名多久过期 10s
     public function __construct()
     {
@@ -24,14 +25,14 @@ class CheckShop extends Controller
             }
             //检查 密码
             $model_shop_secret = new ShopSecretModel();
-            $shopsecret = $model_shop_secret->getInfo([['shopid','=',addslashes($post_data['shopid'])]],[],'shopsecret');
-            if(empty($shopsecret['shopsecret'])){
+            $shop = $model_shop_secret->getInfo([['shopid','=',addslashes($post_data['shopid'])]],[],'shopsecret,shop_code');
+            if(empty($shop['shopsecret'])){
                 throw new \Exception(1002);
             }
             //检查 签名
             $post_sign = $post_data['sign'];
             unset($post_data['sign']);
-            $sign = getSign($post_data, $shopsecret['shopsecret']);
+            $sign = getSign($post_data, $shop['shopsecret']);
             if ($sign != $post_sign){
                 throw new \Exception(1003);
             }
@@ -52,6 +53,7 @@ class CheckShop extends Controller
 //                die(json_encode(['code'=>2001,'message'=>$mess],JSON_UNESCAPED_UNICODE));
             }
         }
+        $this->shop_code = $shop['shop_code'];
         $this->post_data = $post_data;
     }
 

@@ -19,12 +19,14 @@ class Form extends AdminController
     public function form_manage(){
         $keyword = input('get.keyword');//姓名/手机号
         $f_organization = input('get.f_organization');//预约机构
+        $f_project = input('get.f_project');//预约项目
         $query_start_time = input('get.query_start_time');    //预约时间
         $query_end_time = input('get.query_end_time');    //预约时间
         $is_outexcel = input('get.is_outexcel');
         $where = array();
         if($keyword)$where[] = ['f_name|f_phone','like', '%'.$keyword.'%'];
         if($f_organization)$where[] = ['f_organization','like', '%'.$f_organization.'%'];
+        if($f_project)$where[] = ['f_project','like', '%'.$f_project.'%'];
         if (!empty($query_start_time) || !empty($query_end_time)) {//预约时间
             $where[] = getQueryTime('f_date',$query_start_time,$query_end_time);
         }
@@ -59,7 +61,7 @@ class Form extends AdminController
             $arr1[] = '城市';
             $arr1[] = '收货地址';
             $arr1[] = '表单提交时间';
-            createExcel($arr1, $list, '表单管理列表');
+            createExcel($arr1, $list['data'], '表单管理列表');
         } else {
             return return_info('200', '表单管理列表', $list);
         }

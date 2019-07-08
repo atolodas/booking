@@ -10,7 +10,7 @@ use app\home\model\SmsLogModel;
 use think\captcha\Captcha;
 
 //短信
-class Sms extends FormController
+class Sms extends Controller
 {
     private $phone = '';
     private $logic_sms = '';
@@ -72,14 +72,21 @@ class Sms extends FormController
         $sl_array['sl_msg'] = $message_info;
         $sl_array['sl_type'] = 2;//2：手机验证码
         $sl_array['sl_msg_type'] = 1;//1：预约系统
-        $sms_log = SmsLogModel::create($sl_array);
-        $seqid = $sms_log->sl_id;
-        $ret_data['code_id'] = $seqid;
-        //发送验证码
-
-
+        try{
+            Db::startTrans();
+            $sms_log = SmsLogModel::create($sl_array);
+            $seqid = $sms_log->sl_id;
+            $ret_data['code_id'] = $seqid;
+            if(!$seqid)throw new \Exception('发送失败，请稍后再试');
+            //发送验证码
+//            $this->logic_sms->juhe_api($this->phone,$verify_code);
+            Db::commit();
+        }catch (\Exception $e){
+            Db::rollback();
+            return return_info(300,$e->getMessage());
+        }
         if ($seqid) {
-            return return_info(200, '验证码已经发送', ["sl_id" => $seqid]);
+            return return_info(200, '验证码已经发送', ["sl_id" => $seqid,"sl_code" => $verify_code]);
         } else {
             return return_info(300, '发送失败，请稍后再试');
         }

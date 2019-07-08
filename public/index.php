@@ -13,6 +13,13 @@
 namespace think;
 
 header("Content-type: text/html; charset=utf-8");
+// 指定允许其他域名访问
+header('Access-Control-Allow-Origin:*');
+// 响应类型
+header('Access-Control-Allow-Methods:GET,POST,OPTIONS');
+// 响应头设置
+//header('Access-Control-Allow-Headers:x-requested-with,content-type');
+header('Access-Control-Allow-Headers:Origin, X-Requested-With, Content-Type,Accept,Authorization,sess');
 // 加载基础文件
 require __DIR__ . '/../thinkphp/base.php';
 

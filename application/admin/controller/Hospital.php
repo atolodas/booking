@@ -20,8 +20,9 @@ class Hospital extends AdminController
         $h_id = input('post.h_id');//
         $h_pid = input('post.h_pid') ? input('post.h_pid') : 0;
         $h_name = input('post.h_name');//
+        $h_area = input('post.h_area');//地区
         $h_shop_arr = input('post.h_shop_arr');//分店信息，数组
-        if(empty($h_name) || !isset($h_shop_arr)){
+        if(empty($h_name) || !isset($h_shop_arr) || !isset($h_area)){
             return return_info();
         }
 
@@ -38,6 +39,7 @@ class Hospital extends AdminController
         $data = [];
         $data['h_name'] = $h_name;
         $data['h_pid'] = $h_pid;
+        $data['h_area'] = $h_area;
         if($h_id){  //修改
             $this->model_hospital->where([['h_id','=',$h_id]])->update($data);
         }else{
@@ -79,7 +81,7 @@ class Hospital extends AdminController
         if (!empty($query_start_time) || !empty($query_end_time)) {
             $where[] = getQueryTime('create_time',$query_start_time,$query_end_time);
         }
-        $field = 'h_id,h_name,h_pid,create_time';
+        $field = 'h_id,h_name,h_pid,h_area,create_time';
         $list = $this->model_hospital->getListPageTotalInfo($where, [], $field);
 //        echo Db::getLastSql();
         foreach ($list['data'] as $k=>$v){

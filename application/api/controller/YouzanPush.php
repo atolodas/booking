@@ -34,7 +34,7 @@ class YouzanPush{
         }
         //msg内容经过 urlencode 编码，需进行解码
         $msg = json_decode(urldecode($msg),true);
-        $yz_log->log_entry('msg数据',$msg);    //将msg数据记录日志
+        $yz_log->log_entry($json_data['type'].' msg数据',$msg);    //将msg数据记录日志
 
         $model_order = new OrderModel();
         try
@@ -56,7 +56,8 @@ class YouzanPush{
                     $data['total_fee'] = $orders['total_fee'];  //
                     $buyer_note = [];
                     if(!empty($orders['buyer_messages'])){
-                        $data['raw_messages'] = json_encode(json_decode($orders['buyer_messages'],true));
+                        $buyer_messages = json_decode($orders['buyer_messages'],true);
+                        $data['raw_messages'] = json_encode($buyer_messages);
 
                         foreach (json_decode($orders['buyer_messages'],true) as $k => $v) {
                             switch (trim($k)) {
@@ -76,8 +77,28 @@ class YouzanPush{
                     }
                     $data['buyer_messages'] = serialize($buyer_note);  //
 
-                    $data['sku_properties_name'] = isset($orders['sku_properties_name']) ? $orders['sku_properties_name'] : '';
-                    $fans_id = $v['full_order_info']['buyer_info']['fans_id'];
+                    $sku_properties_name = isset($orders['sku_properties_name']) ? $orders['sku_properties_name'] : '';
+                    if($sku_properties_name){
+                        $year_mouth =$day_info= '';
+                        foreach (json_decode($sku_properties_name,true) as $key2=>$value2){
+                            switch (trim($value2['k'])) {
+                                case '预约时间':
+                                case '月份':
+                                case '年份':
+                                    $year_mouth = $value2['v'];
+                                    break;
+                                case '日期':
+                                case '日':
+                                    $day_info = $value2['v'];
+                                    break;
+                            }
+                        }
+                        if($year_mouth.$day_info){
+                            $data['properties_time'] = $year_mouth.$day_info;
+                        }
+                    }
+                    $data['sku_properties_name'] = $sku_properties_name;
+                    $fans_id = $order_detail['buyer_info']['fans_id'];
                     if($fans_id){
                         $youzan = new Youzan();
                         $user_weixin = $youzan->youzan_user_weixin(['fans_id'=>$fans_id]);
@@ -86,7 +107,6 @@ class YouzanPush{
                             $user_arr['fans_id'] = $fans_id;
                             $user_arr['weixin_openid'] = $user_weixin['data']['user']['weixin_openid'];
                             $user_arr['union_id'] = $user_weixin['data']['user']['union_id'];
-//                    $user_arr['fans_nickname'] = $user_weixin['data']['user']['fans_nickname'];
                             $data['outer_user_id'] = $user_arr['weixin_openid'];
                             $data['outer_user_arr'] = json_encode($user_arr);
                         }

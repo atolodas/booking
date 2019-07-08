@@ -43,22 +43,31 @@ class Product extends AdminController
             $product = ProductModel::create($data);
             $p_id = $product->p_id;
         }
+        $arr = $pt_id_arr = [];
+        foreach ($pt_time_arr as $k=>$v){
+            foreach ($v['time_stock'] as $k1=>$v1){
+                if(!$v1['pt_id']){
+                    unset($v1['pt_id']);
+                }else{
+                    $pt_id_arr[] = $v1['pt_id'];
+                }
+                $v1['pt_date'] = $v['pt_date'];
+                $v1['pt_day'] = $v['pt_day'];
+                $v1['h_id'] = $data['h_id'];
+                $v1['h_name'] = $data['h_name'];
+                $v1['p_id'] = $p_id;
+                $v1['p_name'] = $data['p_name'];
+                $arr[] = $v1;
+            }
+        }
+//        var_dump($arr);exit;
         //获取时间主键组合，除此之外的时间全部删除
-        $pt_id_arr = array_filter(array_column($pt_time_arr,'pt_id'));
         if($pt_id_arr){
             $this->model_product_time->where([['p_id','=',$p_id],['pt_id','not in',$pt_id_arr]])->delete();
 //            echo Db::getLastSql();
         }
-        //处理时间
-        foreach ($pt_time_arr as $k=>$v){
-            if(!$v['pt_id'])unset($pt_time_arr[$k]['pt_id']);
-            $pt_time_arr[$k]['h_id'] = $data['h_id'];
-            $pt_time_arr[$k]['h_name'] = $data['h_name'];
-            $pt_time_arr[$k]['p_id'] = $p_id;
-            $pt_time_arr[$k]['p_name'] = $data['p_name'];
-        }
         //添加产品销售日期
-        $res = $this->model_product_time->saveAll($pt_time_arr);
+        $res = $this->model_product_time->saveAll($arr);
 //        echo Db::getLastSql();
         if($product || $res){
             return return_info(200,'操作成功');
@@ -100,11 +109,17 @@ class Product extends AdminController
         }
         $res = $this->model_product->getInfo([['p_id','=',$p_id]],[],'p_id,p_name,h_id,h_name');
         if(!$res){
-            return return_info(300,'删除失败');
+            return return_info(300,'找不到该商品');
         }
         //日期数据
-        $res['h_time_arr'] = $this->model_product_time->getListInfo([['p_id','=',$p_id]],[],'pt_id,pt_date,pt_day,pt_time,pt_stock');
-
+        $h_time_arr = $this->model_product_time->getListInfo([['p_id','=',$p_id]],[],'pt_id,pt_date,pt_day,CONCAT(pt_date,\'-\',pt_day) date_day,pt_time,pt_stock','date_day asc,pt_time asc');
+        $arr =  $arr1 = [];
+        foreach($h_time_arr as $k=>$v){
+            $arr[$v['date_day']]['pt_date'] = $v['pt_date'];
+            $arr[$v['date_day']]['pt_day'] = $v['pt_day'];
+            $arr[$v['date_day']]['time_stock'][] = ['pt_id'=>$v['pt_id'],'pt_time'=>$v['pt_time'],'pt_stock'=>$v['pt_stock']];
+        }
+        $res['h_time_arr'] = array_values($arr);
         return return_info(200,'成功',$res);
     }
     /**

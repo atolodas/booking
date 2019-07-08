@@ -10,4 +10,6 @@ Route::rule('create_shopid','api/Mechanism/create_shopid'); //
 Route::rule('test_sign','api/Mechanism/test_sign'); //
 
 Route::rule('add_injection','api/mechanism/add_injection'); //添加预约记录
+Route::rule('update_reservation_time','api/mechanism/update_reservation_time'); //
+
 

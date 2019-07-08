@@ -12,4 +12,5 @@ Route::rule('appointment_date','web/form/appointment_date'); //预约日期和�
 Route::rule('reservation_info','web/form/reservation_info'); //检查预约信息
 Route::rule('reservation_time','web/form/reservation_time'); //根据产品获取预约时间
 Route::rule('other_stitches','web/form/other_stitches'); //预约二三针
+Route::rule('store_list','web/form/store_list'); //分店列表
 

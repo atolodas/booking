@@ -10,6 +10,7 @@ use app\member\model\MemberTokenModel;
 class FormController extends Controller
 {
     private $overdue_time = 10; //参数加密多久过期 10s
+    public $phone = '';
     /**
      * 统一处理请求的数据
      * 检查权限

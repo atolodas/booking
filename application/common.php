@@ -100,3 +100,43 @@ function getIp() {
     }
     return null;
 }
+/**构造http请求  目前只支持get,post
+ * @param $url
+ * @param array $post_data  post数据
+ * @param array $header_data   请求头数据
+ * @param bool $json   是否使用json格式发送post数据
+ * @return mixed
+ */
+function http_client($url,$post_data = [],$header_data = [],$json = false){
+    $ch = curl_init();
+    curl_setopt($ch,CURLOPT_TIMEOUT,60);
+    curl_setopt($ch,CURLOPT_URL,$url);
+    //判断https请求和http请求
+    if(substr($url , 0 , 5) == 'https'){
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE); // https请求 不验证证书和hosts
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+    }
+    //post json格式数据
+    if(count($post_data) > 0){
+        if($json && is_array($post_data)){
+            $post_data = json_encode($post_data);
+        }
+        curl_setopt($ch,CURLOPT_POST,true);
+        curl_setopt($ch,CURLOPT_POSTFIELDS,$post_data);
+    }
+    //这种post的数据类型
+    if($json){
+        $header_data[] = 'Content-Type: application/json; charset=utf-8';
+        $header_data[] = 'Content-Length:' . strlen($post_data);
+    }
+    if(count($post_data > 0)){
+        curl_setopt($ch,CURLOPT_HTTPHEADER,$header_data);
+    }
+    curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+//    curl_setopt($ch, CURLOPT_PROXY, "127.0.0.1"); //代理服务器地址
+//    curl_setopt($ch, CURLOPT_PROXYPORT, 8888); //代理服务器端口
+    $res_data = curl_exec($ch);
+    curl_close($ch);
+
+    return $res_data;
+}

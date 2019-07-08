@@ -9,6 +9,7 @@ use app\home\model\OrderModel;
 use app\home\model\ProductModel;
 use app\home\model\ProductTimeModel;
 use app\home\logic\Sms as logic_sms;
+use app\lib\Log;
 use app\member\model\MemberTokenModel;
 use think\captcha\Captcha;
 use think\Db;
@@ -20,7 +21,6 @@ use think\Exception;
 class form extends FormController
 {
     private $model_form = [];
-    private $phone = '';
 
     public function __construct()
     {
@@ -42,12 +42,12 @@ class form extends FormController
         }
         //检查是否需要开启图形验证码
         $logic_sms = new logic_sms;
-        $is_captcha = $logic_sms->check_captcha($sl_phone);
+        $is_captcha = $logic_sms->check_captcha($sl_phone,1);
         if($is_captcha)
         {
             if(empty($captcha_code))
             {
-                return return_info(300,'图形验证码');
+                return return_info(300,'请输入图形验证码');
             }
             // 检查图形验证码
             $captcha = new Captcha();
@@ -87,8 +87,9 @@ class form extends FormController
 //            if($check_order_res['code'] != 200){
 //                continue;
 //            }
-            $v['area'] = '';   //地区
             $v['organization'] = $this->get_organization($v['title']);   //预约机构
+            $h_name = HospitalModel::where([['h_name','=',$v['organization']]])->value('h_area');   //地区
+            $v['area'] = $h_name ? $h_name : '';   //地区
             $v['project'] = $this->get_project($v['title']);   //预约服务
             //检查是否预约过   根据
             $is_form = $this->model_form->getInfo([['f_order_sn','=',$v['order_sn']]],[],'f_status');
@@ -118,83 +119,6 @@ class form extends FormController
     /**
      * 开始预约，第一步
      */
-//    public function form_add(){
-//
-//        $post_error = parameter_check(['f_shop','f_name','f_phone','f_weight','f_date','f_time','f_pass_check','f_id_card','f_order_sn','f_address'],1);
-//        if($post_error['code'] == 300){
-//            return $post_error;
-//        }
-//        $data = $post_error['data'];
-//        $data['f_api'] = '有赞';//来源
-//        $data['f_passport'] = input('post.f_passport');//护照（备选填写）
-//        $data['f_remark'] = input('post.f_remark'); //备注
-//        $data['f_bring_back'] = input('post.f_bring_back'); //二三针是否带回
-//
-//        //检查有赞的平台过来的订单，获取订单中的信息
-//        $youzan = new Youzan();
-//        $order_detail = $youzan->youzan_order_detail($data['f_order_sn']);
-//        if($order_detail['code'] !== 200)return return_info(300, '未找到该订单');
-//        $order_detail = $order_detail['data'];
-//        //检查订单是否退款,是否付款
-//        $order_info = $order_detail['full_order_info']['order_info'];   //交易明细详情
-//        $status = $order_info['status'];    //订单状态
-//        $refund_state = $order_info['refund_state'];    //退款状态 0:未退款; 1:部分退款中; 2:部分退款成功; 11:全额退款中; 12:全额退款成功
-//        if($status == 'WAIT_BUYER_PAY')return return_info(300,'订单未付款');//待付款，不允许操作
-//        if($status == 'WAIT_CONFIRM')return return_info(300,'订单待确定');//待确定待成团，不允许操作
-//        if($refund_state == 11)return return_info(300,'订单退款中');//全额退款中
-//        if($refund_state == 12)return return_info(300,'该订单已退款');//全额退款成功
-//
-//        $orders = $order_detail['full_order_info']['orders'][0];    //订单明细结构体
-//        $data['f_order_time'] = $order_info['created'];    //下单时间
-//        $num = $orders['num'];//订单中商品数量
-//        //检查是是否已经预约
-//        $count = $this->model_form->where([['f_order_sn','=',$data['f_order_sn']]])->value('count(*)');//已经约了几次
-//        if($count >= $num){
-//            return return_info(300, '该订单名额已约满');
-//        }
-//        $title = $orders['title'];
-////        $buyer_messages = $orders['buyer_messages'];
-//        //预约机构
-//        preg_match_all('/【(.*?)】/',$title,$result);
-//        $data['f_organization'] = $result[1][0];
-//        $f_project = explode(' ',$title);
-//        //预约项目
-//        $data['f_project'] = $f_project[0];
-//        //是否为HPV预约
-//        if(stripos($data['f_project'],'hpv') !== false){
-//            $data['f_type'] = 1;//1:hpv
-//        }
-////        //二三针是否带回
-////        $buyer_messages = json_decode($buyer_messages,true);
-////        $data['f_bring_back'] = isset($buyer_messages['是否带回']) ? $buyer_messages['是否带回'] : '';
-//        //到付 暂未定规则
-//        $f_collect = explode('|',$title);
-//        $data['f_collect'] = isset($f_collect[1]) ? $f_collect[1] : '';
-//
-//        //根据姓名得到拼音
-//        $pinyin_obj = new Pinyin();
-//        $data['f_pinyin'] = $pinyin_obj->encode($data['f_name'],'all');//拼音全拼
-//        //根据身份证号码得到 出生日期 性别 年龄
-//        $idcard_obj = new Idcard();
-//        $f_id_card = $data['f_id_card'];
-//        //验证身份证号码的正确性
-//        if(!$idcard_obj->isIdCard($f_id_card))return return_info(300,'身份证号码错误');
-//        $data['f_birthday'] = $idcard_obj->get_birthday($f_id_card);   //出生日期
-//        $data['f_age'] = $idcard_obj->get_age($f_id_card);   //年龄
-//        $data['f_sex'] = (string)$idcard_obj->get_sex($f_id_card);   //性别
-////        var_dump($data['f_sex']);exit;
-//        $res = $this->model_form->allowField(true)->save($data);
-//        if($res){
-//            //是否为HPV预约
-//            if(stripos($data['f_project'],'hpv') !== false){
-//                $model_hpv = new HpvModel();
-//                $model_hpv->add_hpv($data['f_name'],$data['f_phone'],1,$data['f_date'],$data['f_time'],1,$this->model_form->f_id);
-//            }
-//            return return_info(200,'操作成功');
-//        }else{
-//            return return_info(300,'操作失败');
-//        }
-//    }
     public function make_appointment()
     {
         $order_sn = input('post.order_sn');
@@ -210,6 +134,7 @@ class form extends FormController
         $data['f_api'] = 'youzan';//来源
         $data['f_passport'] = input('post.f_passport');//护照（备选填写）
         $data['f_address'] = input('post.f_address');//收货地址
+        $data['f_shop'] = input('post.f_shop');//分店
 
         //检查有赞的平台过来的订单，获取订单中的信息
         $check_order_res = $this->check_order($order_sn);
@@ -217,7 +142,7 @@ class form extends FormController
             return $check_order_res;
         }
         $order_detail = $check_order_res['data'];
-        var_dump($order_detail);exit;
+//        var_dump($order_detail);exit;
 
         $order_info = $order_detail['full_order_info']['order_info'];   //交易明细详情
         $orders = $order_detail['full_order_info']['orders'][0];    //订单明细结构体
@@ -263,6 +188,15 @@ class form extends FormController
         $data['f_birthday'] = $idcard_obj->get_birthday($f_id_card);   //出生日期
         $data['f_age'] = $idcard_obj->get_age($f_id_card);   //年龄
         $data['f_sex'] = (string)$idcard_obj->get_sex($f_id_card);   //性别
+        //根据订单号找订单
+        $order = OrderModel::get(['order_sn'=>$order_sn]);
+        if($order){
+            $data['outer_user_id'] = $order['outer_user_id'];
+        }else{
+            //订单不存在系统中，表示出现问题，记录错误日志
+            $log = new Log();
+            $log->log_entry('问题订单号：',$order_sn,'form');//将接收到的原始数据记录日志
+        }
         try{
             Db::startTrans();
             $res = $this->model_form->allowField(true)->save($data);
@@ -288,7 +222,7 @@ class form extends FormController
     {
         $model_order = new OrderModel();
         $model_hpv = new HpvModel();
-        $order_sn = input('post.order_sn');
+        $order_sn = input('get.order_sn');
         $phone = $this->phone;
         if(empty($order_sn))return return_info();
         //检查是否有该订单
@@ -301,15 +235,23 @@ class form extends FormController
         $where = [];
         $where[] = ['a.f_phone','=', $phone];
         $where[] = ['a.f_order_sn','=', $order_sn];
-        $field = 'a.form_id,CONCAT(a.f_name,\'\',(CASE b.f_sex WHEN\'1\' THEN \'男士\' WHEN\'2\' THEN \'女士\' ELSE \'\' END)) name,a.hpv_num,a.plan_state,a.status,CONCAT(a.hpv_date,\' \',a.hpv_time) hpv_date_time,a.finish_time,a.fail_reason,a.create_time';
+        $field = 'a.form_id,CONCAT(a.f_name,\'\',(CASE b.f_sex WHEN\'1\' THEN \'男士\' WHEN\'2\' THEN \'女士\' ELSE \'\' END)) name,a.hpv_num,a.plan_state,a.is_see,a.is_see,a.status,CONCAT(a.hpv_date,\' \',a.hpv_time) hpv_date_time,a.finish_time,a.fail_reason,a.create_time,a.hpv_id';
 //        $field = 'CASE b.f_sex WHEN\'1\' THEN \'男\' WHEN\'2\' THEN \'女\' ELSE \'未知状态\' END AS f_sex,a.hpv_num,a.plan_state,a.status,CONCAT(a.hpv_date,\' \',a.hpv_time) hpv_date_time,a.finish_time,a.fail_reason,a.create_time';
         $arr = $model_hpv->getInfo($where,[['bo_form b','a.form_id = b.f_id']],$field,'hpv_num desc');
 //        echo Db::getLastSql();
-        if(!$arr){
-            return return_info(200, '跳转到立即预约',['hpv_num'=>0]);
-        }
-//        CASE WHEN(b.f_sex=1) THEN ‘男’WHEN(b.f_sex=1) THEN ‘女’ELSE ‘X’END AS f_sex
         unset($arr['hpv_date'],$arr['hpv_time']);
+        if(!$arr){
+            $arr = ['hpv_num'=>0];
+        }else{
+            $model_hpv->where([['hpv_id','=',$arr['hpv_id']]])->update(['is_see'=>$arr['hpv_num']]);
+        }
+        $title = $order['title'];
+        //预约机构
+        $arr['f_organization'] = $this->get_organization($title);
+        //预约项目
+        $arr['f_project'] = $this->get_project($title);
+
+        //处理看过
         return return_info(200,$arr ? '预约信息' : '跳转到第一针预约',$arr);
     }
     /**
@@ -317,11 +259,19 @@ class form extends FormController
      */
     public function reservation_time(){
         $model_product_time = new ProductTimeModel();
-        $p_id = input('get.p_id');
-        if(empty($p_id))return return_info();
-        $product = ProductModel::get($p_id);
-        if(!$product)return return_info(300, '找不到该产品');
-        $time_arr = $model_product_time->getListInfo([['p_id','=',$p_id],['pt_stock','>',0]],[],"CONCAT(pt_date,'-',pt_day) date_day,pt_time",'date_day asc, pt_time asc');
+//        $p_id = input('get.p_id');
+        $organization = trim(input('get.organization'));
+        $project = trim(input('get.p_name'));
+        if(empty($organization) || empty($project))return return_info();
+
+//        $product = ProductModel::get($p_id);
+//        if(!$product)return return_info(300, '找不到该产品');
+        $where = [];
+        $where[] = ['h_name','=',$organization];
+        $where[] = ['p_name','=',$project];
+        $where[] = ['pt_stock','>',0];
+        $time_arr = $model_product_time->getListInfo($where,[],"CONCAT(pt_date,'-',pt_day) date_day,pt_time",'date_day asc, pt_time asc');
+//        echo Db::getLastSql();
         if(!$time_arr)return return_info(300,'该产品暂无可预约时间');
         $newArr=[];
         foreach ($time_arr as $k => $val) {    //数据根据日期分组
@@ -454,6 +404,23 @@ class form extends FormController
         }
 
         return return_info(200,'操作成功');
+    }
+    /**
+     * 分店列表
+     */
+    public function store_list(){
+        $model_hospital = new HospitalModel();
+
+        $organization = input('get.organization');//机构名称
+        if(empty($organization))return return_info();
+        //找到对应的机构id
+        $h_id = $model_hospital->getInfo([['h_name','=',$organization]],[],'h_id');
+        $list = [];
+        if(!empty($h_id)){
+            $list = $model_hospital->getListInfo([['h_pid','=',$h_id['h_id']]],[],'h_id,h_name');
+        }
+
+        return return_info(200,'分店列表',$list);
     }
 
 

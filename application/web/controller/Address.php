@@ -25,7 +25,7 @@ class Address extends Controller
         $parent = input('get.parent') ? input('get.parent') : 0;
         $con = [['parent','=',$parent]];
 
-        $res = $this->model_address->getListInfo($con,[],'code,name','code asc');
+        $res = $this->model_address->getListInfo($con,[],'code,name,level','code asc');
 //        echo Db::getLastSql();
         return return_info(200,'地址列表',$res);
     }

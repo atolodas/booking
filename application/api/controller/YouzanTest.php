@@ -29,8 +29,9 @@ class YouzanTest extends Controller
         $con = [];
         $con['page_no'] = $page_no;
         $con['page_size'] = 100;
-        $con['start_created'] = '2019-05-28 14:16:43';
-        $con['end_created'] = date('Y-m-d H:i:s',time());
+        $con['start_created'] = '2019-07-03 19:08:46';
+        $con['end_created'] = '2019-07-03 19:08:46';
+//        $con['end_created'] = date('Y-m-d H:i:s',time());
         $order_list = $this->youzan->youzan_order_list($con);
 //        var_dump($order_list);exit;
 //        return $order_list;exit;
@@ -55,7 +56,46 @@ class YouzanTest extends Controller
             }
             $arr[$k]['address_info'] = serialize($address_info);  //收货地址信息
             $buyer_messages = $v['full_order_info']['orders'][0]['buyer_messages'];
+            $sku_properties_name = isset($v['full_order_info']['orders'][0]['sku_properties_name']) ? $v['full_order_info']['orders'][0]['sku_properties_name'] : '';
+            if($sku_properties_name){
+                $year_mouth =$day_info= '';
+                foreach (json_decode($sku_properties_name,true) as $key2=>$value2){
+                    switch (trim($value2['k'])) {
+                        case '预约时间':
+                        case '月份':
+                        case '年份':
+                            $year_mouth = $value2['v'];
+                            break;
+                        case '日期':
+                        case '日':
+                            $day_info = $value2['v'];
+                            break;
+//                    case '预约门店':
+//                        $store = $value2['v'];
+//                        break;
+                    }
+                }
+                if($year_mouth.$day_info){
+                    $arr[$k]['properties_time'] = $year_mouth.$day_info;
+                }
+            }
+            $arr[$k]['sku_properties_name'] = $sku_properties_name;
+            $fans_id = $v['full_order_info']['buyer_info']['fans_id'];
+            if($fans_id){
+
+                $user_weixin = $this->youzan->youzan_user_weixin(['fans_id'=>$fans_id]);
+                $user_arr = [];
+                if($user_weixin['code'] == 200){
+                    $user_arr['fans_id'] = $fans_id;
+                    $user_arr['weixin_openid'] = $user_weixin['data']['user']['weixin_openid'];
+                    $user_arr['union_id'] = $user_weixin['data']['user']['union_id'];
+//                    $user_arr['fans_nickname'] = $user_weixin['data']['user']['fans_nickname'];
+                    $arr[$k]['outer_user_id'] = $user_arr['weixin_openid'];
+                    $arr[$k]['outer_user_arr'] = json_encode($user_arr);
+                }
+            }
             if(!empty($buyer_messages)){
+                $arr[$k]['raw_messages'] = json_encode(json_decode($buyer_messages,true));  //
                 $buyer_note = [];
                 foreach (json_decode($buyer_messages,true) as $key => $vo) {
                     switch (trim($key)) {
@@ -86,7 +126,7 @@ class YouzanTest extends Controller
 
     //更新订单数据
     public function update_order($page_no = 1){
-//        echo '修改代码再运行';exit;
+        echo '修改代码再运行';exit;
 
 //        $res = $this->model_order->getListInfo([['o_id','=','24040']],[],'o_id,raw_messages,outer_user_arr');
 //        foreach ($res as $k=>$v){
@@ -101,8 +141,8 @@ class YouzanTest extends Controller
         $con['page_no'] = $page_no;
         $page_size = 20;
         $con['page_size'] = $page_size;
-        $con['start_created'] = '2019-04-25 00:00:00';
-        $con['end_created'] = '2019-04-26 09:15:55';
+        $con['start_created'] = '2019-06-28 17:34:40';
+        $con['end_created'] = '2019-06-28 17:38:19';
 //        $con['start_created'] = '2017-11-15 00:00:00';
 //        $con['end_created'] = '2017-11-19 14:58:50';
 //        $con['end_created'] = date('Y-m-d H:i:s');
@@ -164,78 +204,6 @@ class YouzanTest extends Controller
 //            $this->model_order->saveAll($arr);
 //            sleep(1);
             return $this->update_order($page_no+1);
-        }
-    }
-    //更新订单数据
-    public function update_order1($page_no = 1){
-//        echo '修改代码再运行';exit;
-
-        set_time_limit(0);
-        $con = [];
-        $con['page_no'] = $page_no;
-        $con['page_size'] = 20;
-//        $con['start_created'] = '2018-11-16 10:33:14';
-//        $con['end_created'] = '2019-06-28 00:25:09';
-        $con['start_created'] = '2019-06-10 00:00:00';
-        $con['end_created'] = '2019-06-14 23:59:59';
-//        $con['end_created'] = date('Y-m-d H:i:s');
-        $order_list = $this->youzan->youzan_order_list($con);
-//        var_dump($order_list);exit;
-//        return $order_list;exit;
-        if($order_list['code'] !== 200){
-            var_dump($order_list);
-            return return_info(300, '出错');
-        }
-
-        $order_list = $order_list['data']['full_order_info_list'];
-        $arr = [];
-        foreach ($order_list as $k=>$v){
-            $order_sn = $v['full_order_info']['order_info']['tid'];
-            $o_id = $this->model_order->getInfo([['order_sn','=',$order_sn]],[],'o_id');
-            if($o_id){
-                $data = [];
-//                $data['o_id'] = $o_id['o_id'];
-                $buyer_messages = $v['full_order_info']['orders'][0]['buyer_messages'];
-                if(!empty($buyer_messages)){
-                    $data['raw_messages'] = json_encode(json_decode($buyer_messages,true));  //
-                }
-                $data['sku_properties_name'] = isset($v['full_order_info']['orders'][0]['sku_properties_name']) ? $v['full_order_info']['orders'][0]['sku_properties_name'] : '';
-                $fans_id = $v['full_order_info']['buyer_info']['fans_id'];
-                if($fans_id){
-
-                    $user_weixin = $this->youzan->youzan_user_weixin(['fans_id'=>$fans_id]);
-                    $user_arr = [];
-                    if($user_weixin['code'] == 200){
-                        $user_arr['fans_id'] = $fans_id;
-                        $user_arr['weixin_openid'] = $user_weixin['data']['user']['weixin_openid'];
-                        $user_arr['union_id'] = $user_weixin['data']['user']['union_id'];
-//                    $user_arr['fans_nickname'] = $user_weixin['data']['user']['fans_nickname'];
-                        $data['outer_user_id'] = $user_arr['weixin_openid'];
-                        $data['outer_user_arr'] = json_encode($user_arr);
-                    }
-                }
-//                $data['status'] = !empty($v['full_order_info']['order_info']['status']) ? $v['full_order_info']['order_info']['status'] : '';
-//                $data['status_str'] = !empty($v['full_order_info']['order_info']['status_str']) ? $v['full_order_info']['order_info']['status_str'] : '';
-//                $data['total_fee'] = $v['full_order_info']['orders'][0]['total_fee']; //订单金额
-//                $data['num'] = $v['full_order_info']['orders'][0]['num']; //订单数量
-//                $data['pay_time'] = $v['full_order_info']['order_info']['pay_time'];  //支付时间
-//                $data['refund_state'] = $v['full_order_info']['order_info']['refund_state'];//没能同步退款状态则暂时不导退款状态数据
-//                $data['buyer_words'] = !empty($v['full_order_info']['remark_info']['buyer_message']) ? $v['full_order_info']['remark_info']['buyer_message'] : '';//买家留言
-//                $data['seller_memo'] = !empty($v['full_order_info']['remark_info']['trade_memo']) ? $v['full_order_info']['remark_info']['trade_memo'] : '';//卖家留言
-
-//                $arr[] = $data;
-                var_dump($o_id['o_id']);
-                $arr = $this->model_order->where([['o_id','=',$o_id['o_id']]])->update($data);
-//                echo Db::getLastSql();
-            }
-        }
-//        return $arr;
-        if(count($arr) < 1 || $page_no == 100){ //页码，从1开始，最大不能超过100（有赞文档上的限制）
-            return $page_no;
-        }else{
-//            $this->model_order->saveAll($arr);
-//            sleep(1);
-            return $this->update_order1($page_no+1);
         }
     }
 }

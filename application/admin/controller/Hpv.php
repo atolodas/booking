@@ -2,6 +2,8 @@
 
 namespace app\admin\controller;
 
+use app\home\logic\WxMessage;
+use app\home\model\FormModel;
 use app\home\model\HpvModel;
 
 class Hpv extends AdminController
@@ -61,12 +63,23 @@ class Hpv extends AdminController
         }
         $hpv = HpvModel::get($hpv_id);
         if(!$hpv)return return_info(300, '找不到该hpv信息');
-
+        $form = FormModel::get($hpv['form_id']);
         $hpv->plan_state     = $plan_state;
         $hpv->status     = $status;
         $hpv->fail_reason    = $fail_reason;
         $hpv->finish_time    = date('Y-m-d H:i:s');
         if($hpv->save()){
+            if($plan_state == 1 && $form['outer_user_id']){
+                //发送模板消息
+                $logic_wxmessage = new WxMessage();
+                $message['first'] = '恭喜您购买的'.$form['f_project'].'已预约成功！';  //
+                $message['keyword1'] = $form['f_order_sn'];  //会员卡号
+                $message['keyword2'] = $form['f_organization'];  //预约门诊
+                $message['keyword3'] = $hpv->hpv_date.' '.$hpv->hpv_time;  //预约时间
+                $message['keyword4'] = date('Y-m-d H:i');   //确认时间
+                $message['openid'] = date('Y-m-d H:i');   //确认时间
+                $logic_wxmessage->send_template_message($message);
+            }
             return return_info(200, '操作成功');
         }else{
             return return_info(300, '操作失败');

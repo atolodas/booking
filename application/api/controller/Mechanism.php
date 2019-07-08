@@ -6,6 +6,9 @@ namespace app\api\controller;
 
 use app\home\model\FormModel;
 use app\home\model\HpvModel;
+use app\home\model\ProductCodeModel;
+use app\home\model\ProductModel;
+use app\home\model\ProductTimeModel;
 use app\lib\Log;
 use think\Controller;
 use think\Db;
@@ -82,6 +85,57 @@ class Mechanism extends CheckShop
             $err_arr = return_info(2000,$e->getMessage().$e->getLine());
             $yz_log = new Log();
             $yz_log->log_entry('add_injection错误',$err_arr,'jigou');//将接收到的原始数据记录日志
+            return $err_arr;
+        }
+
+        return return_info(0,'操作成功');
+    }
+    /**
+     * 更新产品预约时间
+     */
+    public function update_reservation_time()
+    {
+        $model_product_time = new ProductTimeModel();
+        try{
+            $post_error = parameter_check(['product_id','product_name','booking_date','booking_time','stock']);
+            if($post_error['code'] == 300){
+                throw new \Exception($post_error['message']);
+            }
+            $data = $post_error['data'];
+            //插入产品时间
+            $model_product_code = new ProductCodeModel();
+            $p_id = $model_product_code->getInfo([['shop_code','=',$this->shop_code],['pro_product_id','=',$data['product_id']]],[],'pro_p_id');
+            if(!$p_id)throw new \Exception('没找到该产品');
+            $p_id = $p_id['pro_p_id'];
+            $product = ProductModel::get($p_id);
+            if(!$product)throw new \Exception('没找到该产品1');
+            $pt_date = substr($data['booking_date'],0,7);
+            $pt_day = substr($data['booking_date'],-2);
+            $time_data = [];
+            $time_data[] = ['p_id','=',$p_id];
+            $time_data[] = ['pt_date','=',$pt_date];
+            $time_data[] = ['pt_day','=',$pt_day];
+            $time_data[] = ['pt_time','=',$data['booking_time']];
+            $p_time = $model_product_time->where($time_data)->field('pt_id')->find();
+            if($p_time){
+                $res = $model_product_time->save(['pt_stock'=>$data['stock']],[['pt_id','=',$p_time['pt_id']]]);
+            }else{
+                $t_data = [];
+                $t_data['p_id'] = $p_id;
+                $t_data['p_name'] = $product->p_name;
+                $t_data['h_id'] = $product->h_id;
+                $t_data['h_name'] = $product->h_name;
+                $t_data['pt_date'] = $pt_date;
+                $t_data['pt_day'] = $pt_day;
+                $t_data['pt_time'] = $data['booking_time'];
+                $t_data['pt_stock'] = $data['stock'];
+                $res = $model_product_time->save($t_data);
+            }
+
+        }catch (\Exception $e){
+            $err_arr = return_info(2000,$e->getMessage());
+            $yz_log = new Log();
+            $yz_log->log_entry('update_reservation_time错误',$err_arr,'jigou');//将接收到的原始数据记录日志
             return $err_arr;
         }
 

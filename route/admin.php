@@ -17,6 +17,7 @@ Route::rule('product_info','product/product_info'); //产品信息
 Route::rule('form_manage','form/form_manage'); //表单管理列表
 
 Route::rule('order_manage','order/order_manage'); //订单管理列表
+Route::rule('order_outexcel','order/order_outexcel'); //
 
 Route::rule('hpv_list','hpv/hpv_list'); //hpv列表
 Route::rule('attendance','hpv/attendance'); //出席状况
